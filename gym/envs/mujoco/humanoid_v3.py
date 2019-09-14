@@ -136,6 +136,7 @@ class HumanoidEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             'x_velocity': x_velocity,
             'y_velocity': y_velocity,
             'forward_reward': forward_reward,
+            'is_healthy': self.is_healthy,
         }
 
         return observation, reward, done, info
@@ -159,3 +160,39 @@ class HumanoidEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 getattr(self.viewer.cam, key)[:] = value
             else:
                 setattr(self.viewer.cam, key, value)
+
+
+class HumanoidStandEnv(HumanoidEnv):
+    def __init__(self, head_height_reward_weight=1.0, *args, **kwargs):
+        utils.EzPickle.__init__(**locals())
+
+        self._head_height_reward_weight = head_height_reward_weight
+
+        return super(HumanoidStandEnv, self).__init__(
+            exclude_current_positions_from_observation=True,
+            forward_reward_weight=0,
+            ctrl_cost_weight=0,
+            contact_cost_weight=0,
+            healthy_reward=0,
+            terminate_when_unhealthy=False,
+            *args,
+            **kwargs,
+        )
+
+    def step(self, *args, **kwargs):
+        observation, reward, done, info = super(
+            HumanoidStandEnv, self).step(*args, **kwargs)
+
+        head_height = self.sim.data.geom_xpos[
+            self.sim.model.geom_name2id('head'), 2]
+
+        head_height_reward = self._head_height_reward_weight * head_height
+
+        info.update({
+            'head_height': head_height,
+            'head_height_reward': head_height_reward
+        })
+
+        reward += head_height_reward
+
+        return observation, reward, done, info

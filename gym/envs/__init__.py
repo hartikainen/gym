@@ -327,6 +327,12 @@ register(
 )
 
 register(
+    id='Humanoid-Stand-v3',
+    entry_point='gym.envs.mujoco.humanoid_v3:HumanoidStandEnv',
+    max_episode_steps=1000,
+)
+
+register(
     id='HumanoidStandup-v2',
     entry_point='gym.envs.mujoco:HumanoidStandupEnv',
     max_episode_steps=1000,
