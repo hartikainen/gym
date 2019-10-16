@@ -10,7 +10,13 @@ class PendulumEnv(gym.Env):
         'video.frames_per_second' : 30
     }
 
-    def __init__(self, g=10.0):
+    def __init__(self,
+                 g=10.0,
+                 angle_reset_range=(-np.pi, np.pi),
+                 speed_reset_range=(-1.0, 1.0)):
+        self._angle_reset_range = angle_reset_range
+        self._speed_reset_range = speed_reset_range
+
         self.max_speed=8
         self.max_torque=2.
         self.dt=.05
@@ -47,8 +53,11 @@ class PendulumEnv(gym.Env):
         return self._get_obs(), -costs, False, {}
 
     def reset(self):
-        high = np.array([np.pi, 1])
-        self.state = self.np_random.uniform(low=-high, high=high)
+        angle_reset_range = self._angle_reset_range
+        speed_reset_range = self._speed_reset_range
+        low = (angle_reset_range[0], speed_reset_range[0])
+        high = (angle_reset_range[1], speed_reset_range[1])
+        self.state = self.np_random.uniform(low=low, high=high)
         self.last_u = None
         return self._get_obs()
 
