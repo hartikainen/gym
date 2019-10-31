@@ -315,6 +315,17 @@ register(
 )
 
 register(
+    id='Ant-Symmetric-v3',
+    entry_point='gym.envs.mujoco.ant_v3:AntEnv',
+    max_episode_steps=1000,
+    reward_threshold=6000.0,
+    kwargs={
+        'xml_file': 'ant-symmetric.xml',
+        'healthy_z_range': (-float('inf'), float('inf')),
+    }
+)
+
+register(
     id='Humanoid-v2',
     entry_point='gym.envs.mujoco:HumanoidEnv',
     max_episode_steps=1000,
